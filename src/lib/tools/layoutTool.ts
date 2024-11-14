@@ -1,8 +1,8 @@
 import type {Ref} from "vue";
 import {rankWith,uiTypeIs, toDataPath, type Layout} from "@jsonforms/core";
 import * as _ from 'lodash-es';
-import {resolveSchema, cloneToolWithSchema, prepareOptionUiOptions} from "@/";
-import type {JsonFormsInterface, JsonFormsUISchema, ToolContext, ToolFinderInterface, ToolInterface} from "@/";
+import {resolveSchema, cloneToolWithSchema, prepareOptionUiOptions} from "@/index";
+import type {JsonFormsInterface, JsonFormsUISchema, ToolContext, ToolFinderInterface, ToolInterface} from "@/index";
 import {schema, uischema} from "./schema/layout.form.json";
 import flexArea from "@/components/tools/flexArea.vue";
 import * as subschemas from "./subschemas";

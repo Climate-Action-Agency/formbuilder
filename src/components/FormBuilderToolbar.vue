@@ -46,7 +46,7 @@ section > button:hover {
 
 <script setup>
 import {computed, ref} from 'vue';
-import {getFormbuilder, getToolDraggingRef, findUnscopedTools} from "@/";
+import {getFormbuilder, getToolDraggingRef, findUnscopedTools} from "@/index";
 import FormBuilderBar from "./FormBuilderBar.vue";
 
 

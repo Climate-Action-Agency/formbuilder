@@ -118,7 +118,7 @@
 import {confirmAndRemoveChild, prepareAndCallOnDropAreaChange, showNewPropertyDialogAndGetTool} from "../..";
 import {toolComponentProps, vuedraggableOptions} from "../../lib/models";
 import Actions from "./utils/Actions.vue";
-import {Vuedraggable} from "@/"
+import {Vuedraggable} from "@/index"
 import {ref, computed, onMounted, nextTick} from 'vue';
 import {unknownTool} from "../../lib/tools/unknownTool";
 import ToolIcon from "./utils/ToolIcon.vue";

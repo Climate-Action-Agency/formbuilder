@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import {getFormbuilder} from "@/";
+import {getFormbuilder} from "@/index";
 import DialogAsModal from "./DialogAsModal.vue";
 import {computed} from "vue";
 

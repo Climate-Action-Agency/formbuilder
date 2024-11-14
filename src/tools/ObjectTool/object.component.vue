@@ -108,7 +108,7 @@ import {
   ToolIcon,
   vuedraggableOptions,
   Vuedraggable,
-} from "@/";
+} from "@/index";
 
 const props = defineProps({...toolComponentProps()})
 

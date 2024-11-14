@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-import {getFormbuilder, type ToolInterface} from "@/";
+import {getFormbuilder, type ToolInterface} from "@/index";
 
 const props = defineProps<{
   tool: ToolInterface

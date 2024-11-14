@@ -1,6 +1,6 @@
 import type {Ref} from "vue";
 import type {JsonSchema, UISchemaElement} from "@jsonforms/core";
-import type {ToolContext, ToolFinderInterface, ToolInterface} from "@/";
+import type {ToolContext, ToolFinderInterface, ToolInterface} from "@/index";
 import {cloneToolWithSchema} from "@/lib";
 
 export const prepareOptionData = (context: ToolContext, tool: ToolInterface): Record<string, any> => {

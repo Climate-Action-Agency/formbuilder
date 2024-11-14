@@ -97,7 +97,7 @@ dialog::backdrop {
 <script setup>
 import {computed, onMounted, ref, useSlots, watch} from 'vue'
 import * as _ from 'lodash-es';
-import {initBaseTools, generateJsonForm, onDragGetTool, ToolFinder, BuilderEvent, useDialogRegistry} from "@/";
+import {initBaseTools, generateJsonForm, onDragGetTool, ToolFinder, BuilderEvent, useDialogRegistry} from "@/index";
 import ToolIcon from "./tools/utils/ToolIcon.vue";
 import FormBuilderToolbar from "./FormBuilderToolbar.vue";
 import Dialogs from "./dialog/Dialogs.vue";

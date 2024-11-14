@@ -1,6 +1,6 @@
 import type {JsonSchema, UISchemaElement} from "@jsonforms/core";
 import * as _ from 'lodash-es';
-import {type ToolContext} from "@/";
+import {type ToolContext} from "@/index";
 import {cleanEmptySchema} from "@/lib/tools/SchemaTool";
 
 export const schemaKeys = ['oneOf', 'allOf', 'anyOf'] as const;

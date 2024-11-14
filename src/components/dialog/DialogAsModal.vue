@@ -73,8 +73,8 @@ dialog > button.close:hover {
 <script setup lang="ts">
 import {ref, h, type Ref, onMounted} from "vue";
 import {Icon} from "@iconify/vue";
-import {getFormbuilder} from "@/";
-import type {DynamicComponent, ModalControl, ModalOptions} from "@/";
+import {getFormbuilder} from "@/index";
+import type {DynamicComponent, ModalControl, ModalOptions} from "@/index";
 import { makeDialogDraggable } from 'dialog-draggable';
 
 makeDialogDraggable();

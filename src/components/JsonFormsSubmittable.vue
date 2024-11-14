@@ -34,7 +34,7 @@
 import {ref, type Ref} from "vue";
 import {JsonForms} from "@jsonforms/vue";
 import type {JsonFormsRendererRegistryEntry, JsonSchema, ValidationMode} from "@jsonforms/core";
-import {createI18nTranslate, getFormbuilder, type ToolInterface} from "@/";
+import {createI18nTranslate, getFormbuilder, type ToolInterface} from "@/index";
 import {formBuilderCatalogue} from "@/translations/de";
 
 const props = defineProps<{

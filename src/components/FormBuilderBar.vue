@@ -85,8 +85,8 @@ aside .toolItem {
 
 <script setup>
 import {ref} from 'vue';
-import {Vuedraggable} from "@/"
-import {getFormbuilder, getToolDraggingRef, cloneEmptyTool} from "@/";
+import {Vuedraggable} from "@/index"
+import {getFormbuilder, getToolDraggingRef, cloneEmptyTool} from "@/index";
 
 /**
  * @see https://sortablejs.github.io/vue.draggable.next/#/clone-on-control
