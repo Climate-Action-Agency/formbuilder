@@ -19,7 +19,8 @@
     }
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5175",
+    "dev:vercel": "vercel dev --listen 5175",
     "build": "vite build && vue-tsc --declaration --emitDeclarationOnly --outDir dist/types ",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest"
