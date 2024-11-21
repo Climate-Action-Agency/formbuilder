@@ -26,13 +26,13 @@
     <button @click="importSchema" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-24">Import Schema</button>
 
     <FormBuilder
+          :key="importedFormHash + example + (schemaOnly?'schemaonly':'') + (schemaReadOnly?'readonly':'') + (schemaBaseTool?'schema':'') + changeKey"
           :jsonForms="jsonForms"
           :jsonFormsRenderers="jsonFormsRenderers"
           :schemaOnly="schemaOnly"
           :schemaReadOnly="schemaReadOnly"
           :tools="tools"
           :uiOptions="uiOptions"
-          :key="example + (schemaOnly?'schemaonly':'') + (schemaReadOnly?'readonly':'') + (schemaBaseTool?'schema':'') + changeKey"
           :schemaTool="schemaBaseTool ? 'schema' : ''"
           @schemaUpdated="onSchemaUpdated"
           ref="fb"
@@ -135,17 +135,31 @@ const rootUiSchema = ref();
 
 const importedForm = ref();
 
-const DEFAULT_IMPORT = JSON.stringify(
+const DEFAULT_IMPORT = (
   {"schema":{"type":"object","properties":{"requirements":{"type":"object","properties":{"req1":{"type":"boolean","title":"Disclose gross Scope 1 GHG emissions in metric tonnes of CO2eq."},"req2":{"type":"boolean","title":"Report the percentage of Scope 1 emissions regulated under emissions trading schemes."},"req3":{"type":"boolean","title":"Detail gross location-based Scope 2 GHG emissions in metric tonnes of CO2eq."}}},"description":{"type":"string"},"total-ghg-emissions":{"type":"array","items":{"type":"object","properties":{"emission-method":{"type":"string"},"metric-tonnes-co2eq":{"type":"number"}}}}}},
    "uischema":{"type":"VerticalLayout","elements":[{"type":"HorizontalLayout","elements":[{"type":"VerticalLayout","elements":[{"type":"Label","text":"Describe the undertaking’s disclosure of GHG emissions in metric tonnes of CO2eq, separately addressing Scopes 1, 2, 3, and total emissions. Ensure to include disaggregation and any changes in the undertaking’s reporting definition."},{"type":"Control","scope":"#/properties/description","options":{"multi":true}},{"type":"Control","scope":"#/properties/total-ghg-emissions","label":"Table: Total GHG Emissions"}]},{"type":"VerticalLayout","elements":[{"type":"Label","text":"Objective","options":{"styles":{"undefined":{"undefined":"heading"}}}},{"type":"Label","text":"The objective of this Disclosure Requirement is to provide a comprehensive understanding of the undertaking’s gross greenhouse gas emissions, detailing the direct, indirect, and value chain impacts. This includes a breakdown by operational control and analysis of emissions-driven transition risks. Proper documentation is essential for aligning with climate-related targets and EU policy goals."},{"type":"Label","text":"Requirements","options":{"styles":{"undefined":{"undefined":"heading"}}}},{"type":"Label","text":"Make sure you address the following areas:"},{"type":"Control","scope":"#/properties/requirements"}]}]}]}}
 );
 
 const importSchema = () => {
-  const bothSchemas = window.prompt('Enter schema/uischema JSON', DEFAULT_IMPORT);
+  const bothSchemas = window.prompt('Enter schema/uischema JSON', JSON.stringify(DEFAULT_IMPORT));
   if (bothSchemas) {
     importedForm.value = JSON.parse(bothSchemas);
   }
 }
+
+function generateShortHash(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char; // bitwise hash
+    hash = hash & hash; // convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(36); // convert to base36 for a shorter string
+}
+
+const importedFormHash = computed(() => {
+  return importedForm.value ? generateShortHash(JSON.stringify(importedForm.value)) : null;
+})
 
 const onSchemaUpdated = (jsonForms) => {
   rootSchema.value = jsonForms.schema;
@@ -168,7 +182,7 @@ const jsonForms = computed(() => {
         newSchemaData.schema = generateJsonSchema({});
       }
 
-      if(false === newSchemaData?.uischema) {
+      if (false === newSchemaData?.uischema) {
         if(!schemaOnly.value) {
           newSchemaData.uischema = generateDefaultUISchema(newSchemaData.schema)
         }
@@ -200,17 +214,12 @@ const jsonForms = computed(() => {
   }
 
   if (jsonFormsExternalChanges.value) {
-    console.log('jsonFormsExternalChanges.value:', jsonFormsExternalChanges.value);
     return jsonFormsExternalChanges.value;
   }
   else if (importedForm.value) {
-    console.log('importedForm.value:', importedForm.value);
     newSchemaData = importedForm.value;
-    updateSchemaData();
-    //importedForm.value = undefined;
   }
   else if (example.value) {
-    console.log('example.value:', example.value);
     newSchemaData = getExamples().find(item => item.name===example.value) as any;
     newSchemaData = newSchemaData && JSON.parse(JSON.stringify(newSchemaData)); //clone
     updateSchemaData();
@@ -228,7 +237,6 @@ const jsonForms = computed(() => {
   latestExampleData.value = unref(newSchemaData);
   latestSchemaAfterExampleData.value = null;
 
-  console.log('jsonForms computed end:', JSON.stringify(newSchemaData));
   return newSchemaData
 });
 
