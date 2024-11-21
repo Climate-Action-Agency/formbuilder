@@ -23,7 +23,9 @@
       </div>
     </div>
 
-      <FormBuilder
+    <button @click="importSchema" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-24">Import Schema</button>
+
+    <FormBuilder
           :jsonForms="jsonForms"
           :jsonFormsRenderers="jsonFormsRenderers"
           :schemaOnly="schemaOnly"
@@ -130,6 +132,21 @@ const baseSchemaTool = computed(() => fb.value?.baseSchemaTool);
 
 const rootSchema = ref();
 const rootUiSchema = ref();
+
+const importedForm = ref();
+
+const DEFAULT_IMPORT = JSON.stringify(
+  {"schema":{"type":"object","properties":{"requirements":{"type":"object","properties":{"req1":{"type":"boolean","title":"Disclose gross Scope 1 GHG emissions in metric tonnes of CO2eq."},"req2":{"type":"boolean","title":"Report the percentage of Scope 1 emissions regulated under emissions trading schemes."},"req3":{"type":"boolean","title":"Detail gross location-based Scope 2 GHG emissions in metric tonnes of CO2eq."}}},"description":{"type":"string"},"total-ghg-emissions":{"type":"array","items":{"type":"object","properties":{"emission-method":{"type":"string"},"metric-tonnes-co2eq":{"type":"number"}}}}}},
+   "uischema":{"type":"VerticalLayout","elements":[{"type":"HorizontalLayout","elements":[{"type":"VerticalLayout","elements":[{"type":"Label","text":"Describe the undertaking’s disclosure of GHG emissions in metric tonnes of CO2eq, separately addressing Scopes 1, 2, 3, and total emissions. Ensure to include disaggregation and any changes in the undertaking’s reporting definition."},{"type":"Control","scope":"#/properties/description","options":{"multi":true}},{"type":"Control","scope":"#/properties/total-ghg-emissions","label":"Table: Total GHG Emissions"}]},{"type":"VerticalLayout","elements":[{"type":"Label","text":"Objective","options":{"styles":{"undefined":{"undefined":"heading"}}}},{"type":"Label","text":"The objective of this Disclosure Requirement is to provide a comprehensive understanding of the undertaking’s gross greenhouse gas emissions, detailing the direct, indirect, and value chain impacts. This includes a breakdown by operational control and analysis of emissions-driven transition risks. Proper documentation is essential for aligning with climate-related targets and EU policy goals."},{"type":"Label","text":"Requirements","options":{"styles":{"undefined":{"undefined":"heading"}}}},{"type":"Label","text":"Make sure you address the following areas:"},{"type":"Control","scope":"#/properties/requirements"}]}]}]}}
+);
+
+const importSchema = () => {
+  const bothSchemas = window.prompt('Enter schema/uischema JSON', DEFAULT_IMPORT);
+  if (bothSchemas) {
+    importedForm.value = JSON.parse(bothSchemas);
+  }
+}
+
 const onSchemaUpdated = (jsonForms) => {
   rootSchema.value = jsonForms.schema;
   rootUiSchema.value = jsonForms.uischema;
@@ -143,51 +160,60 @@ const onSchemaUpdated = (jsonForms) => {
 }
 
 const jsonForms = computed(() => {
-  let exampleData = {schema:undefined, uischema:undefined} as any;
+  let newSchemaData = {schema:undefined, uischema:undefined} as any;
 
-  if(jsonFormsExternalChanges.value) {
-    return jsonFormsExternalChanges.value;
-  }
-  else if(example.value) {
-    exampleData = getExamples().find(item => item.name===example.value) as any;
-    exampleData = exampleData && JSON.parse(JSON.stringify(exampleData)); //clone
-
-
-    if(exampleData) {
-      if (!exampleData?.schema) {
-        exampleData.schema = generateJsonSchema({});
+  const updateSchemaData = () => {
+    if (newSchemaData) {
+      if (!newSchemaData?.schema) {
+        newSchemaData.schema = generateJsonSchema({});
       }
 
-      if(false === exampleData?.uischema) {
+      if(false === newSchemaData?.uischema) {
         if(!schemaOnly.value) {
-          exampleData.uischema = generateDefaultUISchema(exampleData.schema)
+          newSchemaData.uischema = generateDefaultUISchema(newSchemaData.schema)
         }
       }
       else {
           //:TODO only clean uischema if option is set (or add "auto" option -> generateDefaultUISchema())
-        if(exampleData?.uischema && schemaReadOnly.value) {
-          exampleData.uischema = {
+        if (newSchemaData?.uischema && schemaReadOnly.value) {
+          newSchemaData.uischema = {
               type:'VerticalLayout'
           };
         }
 
-        if(!exampleData?.uischema && !schemaReadOnly.value) {
+        if (!newSchemaData?.uischema && !schemaReadOnly.value) {
           console.log("sandbox app","UiSschema generated because example is empty");
-          exampleData.uischema = generateDefaultUISchema(exampleData.schema)
+          newSchemaData.uischema = generateDefaultUISchema(newSchemaData.schema)
         }
       }
-
       //:DEV
       // const output = [];
-      // const p = exampleData.schema.properties;
+      // const p = newSchemaData.schema.properties;
       // Object.keys(p).map(key => {
       //   output.push([key,p[key].type ?? p[key]['$ref']])
       // })
       // console.table(output)
     }
     else {
-      exampleData = {schema:undefined,uischema:undefined}
+      newSchemaData = {schema:undefined,uischema:undefined}
     }
+  }
+
+  if (jsonFormsExternalChanges.value) {
+    console.log('jsonFormsExternalChanges.value:', jsonFormsExternalChanges.value);
+    return jsonFormsExternalChanges.value;
+  }
+  else if (importedForm.value) {
+    console.log('importedForm.value:', importedForm.value);
+    newSchemaData = importedForm.value;
+    updateSchemaData();
+    //importedForm.value = undefined;
+  }
+  else if (example.value) {
+    console.log('example.value:', example.value);
+    newSchemaData = getExamples().find(item => item.name===example.value) as any;
+    newSchemaData = newSchemaData && JSON.parse(JSON.stringify(newSchemaData)); //clone
+    updateSchemaData();
     jsonFormsExternalChanges.value = undefined;
   }
   else {
@@ -196,19 +222,14 @@ const jsonForms = computed(() => {
     if("additionalProperties" in schema) {
       delete schema.additionalProperties;
     }
-
-    exampleData = {schema: schema, uischema: uischema};
+    newSchemaData = {schema: schema, uischema: uischema};
   }
 
-  if(schemaOnly.value) {
-    //delete exampleData.uischema;
-  }
-
-
-  latestExampleData.value = unref(exampleData);
+  latestExampleData.value = unref(newSchemaData);
   latestSchemaAfterExampleData.value = null;
 
-  return exampleData
+  console.log('jsonForms computed end:', JSON.stringify(newSchemaData));
+  return newSchemaData
 });
 
 const updateJsonFormDebounced = _.debounce((a) => {
